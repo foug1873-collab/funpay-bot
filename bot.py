@@ -1,3 +1,18 @@
+import sys
+import weakref
+
+# Защита от ошибки weakref на свежих версиях Python (3.14+)
+if sys.version_info >= (3, 14):
+    try:
+        old_new = weakref.ref.__new__
+        def patched_ref_new(cls, *args, **kwargs):
+            if args and args[0] is None:
+                return None
+            return old_new(cls, *args, **kwargs)
+        weakref.ref.__new__ = patched_ref_new
+    except Exception:
+        pass
+
 import logging
 import uuid
 import asyncio
@@ -136,4 +151,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
     
